@@ -1,14 +1,18 @@
+// types/tasks.ts
 export interface ITask {
-  id: number;
+  id: string;  // Keep as string to match API response
   title: string;
   description: string;
   status: boolean;
-  created_at?: Date;
+  created_at?: string;
 }
 
-// Add a new interface for creating tasks
 export interface ICreateTask {
   title: string;
   description: string;
   status: boolean;
+}
+
+export interface IUpdateTask extends ICreateTask {
+  id: string;  // Keep as string
 }

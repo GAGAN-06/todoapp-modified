@@ -51,3 +51,36 @@ export const deleteTodo = async (id: string): Promise<void> => {
     },
   });
 };
+
+// api.ts
+export const searchTodos = async (searchTerm: string): Promise<ITask[]> => {
+  try {
+    const res = await fetch(`/api/todos/search?q=${encodeURIComponent(searchTerm)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({ error: 'Unknown error occurred' }));
+      throw new Error(errorData.error || `Search failed with status: ${res.status}`);
+    }
+
+    const text = await res.text(); // Get response as text first
+    if (!text) {
+      return []; // Return empty array if response is empty
+    }
+
+    try {
+      const data = JSON.parse(text); // Try to parse the JSON
+      return data;
+    } catch (e) {
+      console.error('JSON Parse Error:', text); // Log the actual response
+      throw new Error('Invalid JSON response from server');
+    }
+  } catch (error) {
+    console.error('Search Error:', error);
+    throw error;
+  }
+};

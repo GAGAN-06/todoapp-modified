@@ -1,3 +1,4 @@
+// app/components/AddTask.tsx
 "use client";
 
 import { AiOutlinePlus } from "react-icons/ai";
@@ -6,6 +7,7 @@ import { FormEventHandler, useState } from "react";
 import { addTodo } from "@/api";
 import { useRouter } from "next/navigation";
 import { TaskSchema } from "../lib/validation";
+import { z } from "zod";
 
 const AddTask = () => {
   const router = useRouter();
@@ -15,27 +17,38 @@ const AddTask = () => {
   const [errors, setErrors] = useState<{
     title?: string[];
     description?: string[];
+    submit?: string[];
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
     try {
-      TaskSchema.parse({
+      // Only validate the fields we're submitting
+      const taskData = {
         title: newTaskTitle,
         description: newTaskDescription,
         status: false
+      };
+
+      // Use partial schema without id and created_at
+      const AddTaskSchema = z.object({
+        title: TaskSchema.shape.title,
+        description: TaskSchema.shape.description,
+        status: TaskSchema.shape.status,
       });
+
+      AddTaskSchema.parse(taskData);
       setErrors({});
       return true;
     } catch (error) {
-      if (error instanceof Error) {
-        const zodError = JSON.parse(error.message);
+      if (error instanceof z.ZodError) {
         const formattedErrors: { [key: string]: string[] } = {};
-        zodError.forEach((err: any) => {
-          if (!formattedErrors[err.path[0]]) {
-            formattedErrors[err.path[0]] = [];
+        error.errors.forEach((err) => {
+          const path = err.path[0] as string;
+          if (!formattedErrors[path]) {
+            formattedErrors[path] = [];
           }
-          formattedErrors[err.path[0]].push(err.message);
+          formattedErrors[path].push(err.message);
         });
         setErrors(formattedErrors);
       }
@@ -60,7 +73,10 @@ const AddTask = () => {
       router.refresh();
     } catch (error) {
       console.error("Error adding todo:", error);
-      // Handle API errors
+      setErrors(prev => ({
+        ...prev,
+        submit: [(error as Error).message || 'Failed to add todo']
+      }));
     } finally {
       setIsSubmitting(false);
     }
@@ -78,6 +94,11 @@ const AddTask = () => {
       <Modal modalOpen={modalOpen} setModalOpen={setModalOpen}>
         <form onSubmit={handleSubmitNewTodo}>
           <h3 className="font-bold text-lg">Add new task</h3>
+          {errors.submit && (
+            <div className="alert alert-error mt-4">
+              <span>{errors.submit.join(", ")}</span>
+            </div>
+          )}
           <div className="modal-action flex flex-col gap-4">
             <div className="form-control w-full">
               <input

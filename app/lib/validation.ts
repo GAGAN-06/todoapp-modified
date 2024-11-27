@@ -1,7 +1,9 @@
+// lib/validation.ts
 import { z } from 'zod';
 
 // Task validation schema
 export const TaskSchema = z.object({
+  id: z.union([z.string(), z.number()]).transform(val => String(val)), // Accept both string and number, convert to string
   title: z.string()
     .min(1, 'Title is required')
     .max(100, 'Title must be less than 100 characters'),
@@ -9,14 +11,11 @@ export const TaskSchema = z.object({
     .min(1, 'Description is required')
     .max(500, 'Description must be less than 500 characters'),
   status: z.boolean(),
+  created_at: z.union([z.string(), z.date()]).optional() // Accept both string and date
 });
 
 // Response validation schemas
-export const TaskResponseSchema = TaskSchema.extend({
-  id: z.string(),
-  created_at: z.string().datetime().optional(),
-});
-
+export const TaskResponseSchema = TaskSchema;
 export const TasksResponseSchema = z.array(TaskResponseSchema);
 
 // Type inference
@@ -25,15 +24,21 @@ export type TaskResponse = z.infer<typeof TaskResponseSchema>;
 
 // Validation functions
 export const validateTask = (data: unknown): TaskInput => {
-  return TaskSchema.parse(data);
-};
+    return TaskSchema.parse(data);
+  };
+  
+  export const validateTaskResponse = (data: unknown): TaskResponse => {
+    return TaskResponseSchema.parse(data);
+  };
 
-export const validateTaskResponse = (data: unknown): TaskResponse => {
-  return TaskResponseSchema.parse(data);
-};
-
+// Validation functions
 export const validateTasksResponse = (data: unknown): TaskResponse[] => {
-  return TasksResponseSchema.parse(data);
+  try {
+    return TasksResponseSchema.parse(data);
+  } catch (error) {
+    console.error('Validation Error:', error);
+    throw error;
+  }
 };
 
 // Custom error formatter

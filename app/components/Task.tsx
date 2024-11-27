@@ -1,3 +1,4 @@
+// app/components/Task.tsx
 "use client";
 
 import { FormEventHandler, useState } from "react";
@@ -5,14 +6,10 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 import Modal from "./Modal";
 import { useRouter } from "next/navigation";
 import { deleteTodo, editTodo } from "@/api";
+import { ITask } from "@/types/tasks";
 
 interface TaskProps {
-  task: {
-    id: string;
-    title: string;
-    description: string;
-    status: boolean;
-  }
+  task: ITask;
 }
 
 const Task: React.FC<TaskProps> = ({ task }) => {
@@ -43,7 +40,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     router.refresh();
   };
 
-  const toggleStatus = async () => {
+  const handleToggleStatus = async () => {
     await editTodo({
       ...task,
       status: !task.status
@@ -61,7 +58,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
       </td>
       <td>
         <button 
-          onClick={toggleStatus}
+          onClick={handleToggleStatus}
           className={`px-2 py-1 rounded text-sm ${
             task.status 
               ? 'bg-green-100 text-green-800' 
