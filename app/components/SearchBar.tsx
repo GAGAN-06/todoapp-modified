@@ -1,4 +1,3 @@
-// app/components/SearchBar.tsx
 "use client";
 
 import { useCallback, useState } from 'react';
