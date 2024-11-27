@@ -1,4 +1,3 @@
-// app/api/todos/route.ts
 import { NextResponse } from 'next/server';
 import { query } from '../../lib/db';
 import { validateTask, validateTasksResponse, formatZodError } from '../../lib/validation';

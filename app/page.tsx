@@ -1,4 +1,3 @@
-// app/page.tsx
 import { Suspense } from 'react';
 import AddTask from './components/AddTask';
 import TodoList from './components/TodoList';

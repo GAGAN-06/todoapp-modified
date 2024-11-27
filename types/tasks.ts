@@ -1,4 +1,3 @@
-// types/tasks.ts
 export interface ITask {
   id: string;  // Keep as string to match API response
   title: string;

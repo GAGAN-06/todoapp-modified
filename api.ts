@@ -52,7 +52,6 @@ export const deleteTodo = async (id: string): Promise<void> => {
   });
 };
 
-// api.ts
 export const searchTodos = async (searchTerm: string): Promise<ITask[]> => {
   try {
     const res = await fetch(`/api/todos/search?q=${encodeURIComponent(searchTerm)}`, {

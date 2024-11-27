@@ -1,6 +1,5 @@
 "use client";
 
-import { TaskRowSkeleton } from './TaskRowSkeleton';
 import React, { useState } from "react";
 import Task from "./Task";
 import SearchBar from "./SearchBar";
